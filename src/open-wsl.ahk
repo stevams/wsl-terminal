@@ -1,5 +1,6 @@
 #NoTrayIcon
 #NoEnv
+SetTitleMatchMode, 2
 
 ; Read ini file {{{1
 ini_file = %A_ScriptDir%\etc\wsl-terminal.conf
@@ -54,20 +55,37 @@ if (exe_name == "run-wsl-file") {
     if (argc > 0) {
         filepath := %argc%
 
-        Loop, % argc - 1 {
-            options .= " " %A_Index%
+        loop, % argc - 1 {
+            options .= " " %a_index%
         }
 
-        SplitPath, filepath, filename, dir
-        SetWorkingDir, %dir%
+        splitpath, filepath, filename, dir
+        setworkingdir, %dir%
 
-        if (InStr(filename, " ")) {
+        if (instr(filename, " ")) {
             filename = "%filename%"
         }
     }
 
-    Run, %mintty_base% %mintty_options% -t "%filepath%" %wslbridge_base% -t "%exe_name%" %options% %filename%
-    ExitApp
+    cmd = nvim %filename%
+    opts = -t -e use_tmux=1
+
+  ; find bash.exe {{{1
+    bash_exe = %a_windir%\sysnative\bash.exe
+      bash_exe = %a_windir%\system32\bash.exe
+    } if (!fileexist(bash_exe)) {
+      msgbox, 0x10, , wsl(windows subsystem for linux) must be installed.
+        exitapp, 1
+        if (!fileexist(bash_exe)) {
+    }
+
+    if (winexist(title)) {
+        run, "%bash_exe%" -c 'tmux new-window nvim %filename%', , hide
+    } else {
+      run, %mintty_base% %mintty_options% -t "%filepath%" %wslbridge_base% %opts% %cmd%
+    }
+
+    exitapp
 }
 
 ; Parse arguments {{{1
