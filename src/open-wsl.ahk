@@ -56,7 +56,7 @@ if (exe_name == "run-wsl-file") {
         filepath := %argc%
 
         loop, % argc - 1 {
-            options .= " " %a_index%
+            options .= " " %A_Index%
         }
 
         splitpath, filepath, filename, dir
@@ -70,13 +70,13 @@ if (exe_name == "run-wsl-file") {
     cmd = nvim %filename%
     opts = -t -e use_tmux=1
 
-  ; find bash.exe {{{1
-    bash_exe = %a_windir%\sysnative\bash.exe
-      bash_exe = %a_windir%\system32\bash.exe
-    } if (!fileexist(bash_exe)) {
-      msgbox, 0x10, , wsl(windows subsystem for linux) must be installed.
-        exitapp, 1
-        if (!fileexist(bash_exe)) {
+    ; find bash.exe {{{1
+    bash_exe = %A_WinDir%\sysnative\bash.exe
+    if (!FileExist(bash_exe)) {
+      bash_exe = %A_WinDir%\system32\bash.exe
+    } if (!FileExist(bash_exe)) {
+      MsgBox, 0x10, , WSL(Windows Subsystem for Linux) must be installed.
+        ExitApp, 1
     }
 
     if (winexist(title)) {
