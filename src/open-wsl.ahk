@@ -81,6 +81,16 @@ if (exe_name == "run-wsl-file") {
 
     if (winexist(title)) {
         run, "%bash_exe%" -c 'tmux new-window nvim %filename%', , hide
+
+        ; Activate window {{{1
+        Loop, 5 {
+            WinActivate, %title%
+            if (WinActive(title)) {
+                break
+            }
+
+            Sleep, 50
+        }
     } else {
       run, %mintty_base% %mintty_options% -t "%filepath%" %wslbridge_base% %opts% %cmd%
     }
